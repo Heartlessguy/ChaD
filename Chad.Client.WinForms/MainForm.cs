@@ -63,14 +63,16 @@ namespace Chad.Client.WinForms
         {
             ServerAddressText.Enabled = false;
             ServerPortText.Enabled = false;
-            ConnectButton.Text = @"Disconnect";
+            ServerUsername.Enabled = false;
+            ConnectButton.Enabled = false;
         }
 
         private void ConnectionInputUnlock()
         {
             ServerAddressText.Enabled = true;
             ServerPortText.Enabled = true;
-            ConnectButton.Text = @"Connect";
+            ServerUsername.Enabled = true;
+            ConnectButton.Enabled = true;
         }
         private void DrawText(string text)
         {
@@ -122,9 +124,16 @@ namespace Chad.Client.WinForms
 
             _recipientId = recipient?.Id ?? 0;
             if (recipient == null || recipient.MessageHistory == null) return;
-            foreach (var record in recipient.MessageHistory)
+            try
             {
-                DrawText($"{(record.IsIncoming ? recipient.Name : "Me")}: {record.Message}");
+                foreach (var record in recipient.MessageHistory)
+                {
+                    DrawText($"{(record.IsIncoming ? recipient.Name : "Me")}: {record.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusBar.Text = ex.Message;
             }
         }
 

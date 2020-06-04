@@ -20,7 +20,6 @@ namespace ChaD.client
         public override void MessageProcessor(string message)
         {
             if (message == "") return;
-            // Command section
             if (message[0] == '/')
             {
                 var commandArray = message.Split("࣐");

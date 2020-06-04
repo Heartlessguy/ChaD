@@ -16,7 +16,6 @@ namespace ChaD.client
            var serverSocket = new Socket(IPAddress.Parse(address).AddressFamily, SocketType.Stream, ProtocolType.Tcp);
            serverSocket.Connect(new IPEndPoint(IPAddress.Parse(address), port));
            ServerConnection = new ServerConnection(serverSocket);
-           MainForm._appendText("test");
            ServerConnection.Send($"/auth࣐{name}");
         }
 

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ChaD.server.Models;
+using Serilog;
+using Serilog.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using ChaD.server.Models;
-using Serilog;
-using Serilog.Core;
 
 namespace ChaD.server.Services
 {
@@ -21,15 +21,15 @@ namespace ChaD.server.Services
             Users = new List<UserConnection>();
             _host = host;
             _port = port;
-            serverSocket = new Socket(IPAddress.Parse(host).AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            serverSocket.Bind(new IPEndPoint(IPAddress.Parse(host), port));
-            serverSocket.Listen();
+            _serverSocket = new Socket(IPAddress.Parse(host).AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            _serverSocket.Bind(new IPEndPoint(IPAddress.Parse(host), port));
+            _serverSocket.Listen(5);
             IsWorking = true;
             Log.Information($"Server started at {host}:{port}.");
         }
         private int _port;
         private string _host;
-        private Socket serverSocket;
+        private readonly Socket _serverSocket;
         public static Logger Log;
 
         public bool IsWorking;
@@ -39,7 +39,7 @@ namespace ChaD.server.Services
         {
             while (IsWorking)
             {
-                Socket socketHandler = serverSocket.Accept();
+                var socketHandler = _serverSocket.Accept();
                 Log.Information($@"Accepted connection from {socketHandler.RemoteEndPoint}");
                 AddUser(socketHandler);
             }

@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ChaD.server.Properties {
-    using System;
-    
-    
+namespace ChaD.server.Properties
+{
+
+
     /// <summary>
     ///   Класс ресурса со строгой типизацией для поиска локализованных строк и т.д.
     /// </summary>

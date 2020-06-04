@@ -1,10 +1,9 @@
-﻿using System;
+﻿using ChaD.server.Services;
+using ChaD.shared.Services;
+using System;
 using System.Linq;
 using System.Net.Sockets;
 using System.Timers;
-using ChaD.server.Services;
-using ChaD.shared.Services;
-using Serilog;
 
 namespace ChaD.server.Models
 {

@@ -1,5 +1,5 @@
-﻿using System.Net.Sockets;
-using ChaD.server.Models;
+﻿using ChaD.server.Models;
+using System.Net.Sockets;
 
 namespace ChaD.server.Services
 {

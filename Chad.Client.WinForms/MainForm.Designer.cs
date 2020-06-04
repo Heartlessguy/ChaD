@@ -152,6 +152,7 @@
             this.ChatBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ChatBox.Location = new System.Drawing.Point(0, 0);
             this.ChatBox.Name = "ChatBox";
+            this.ChatBox.ReadOnly = true;
             this.ChatBox.Size = new System.Drawing.Size(599, 380);
             this.ChatBox.TabIndex = 0;
             this.ChatBox.Text = "";
