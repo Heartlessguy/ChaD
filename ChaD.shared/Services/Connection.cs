@@ -5,18 +5,20 @@ using System.Threading;
 
 namespace ChaD.shared.Services
 {
-    public class ConnectionService
+    public class Connection
     {
-        private Thread _listenerThread;
-        private Socket _userSocket;
+        protected Thread _listenerThread;
+        protected Socket _userSocket;
 
         /// <summary>
         /// Инициализация класса с заданым сокетом. Инициализация и запуск потока прослушивания
         /// </summary>
         /// <param name="socket"></param>
-        public ConnectionService(Socket socket)
+        public Connection(Socket socket)
         {
             _userSocket = socket;
+            _userSocket.ReceiveBufferSize = 2048;
+            _userSocket.SendBufferSize = 2048;
             _listenerThread = new Thread(Listen) { IsBackground = true };
             _listenerThread.Start();
         }
@@ -28,25 +30,26 @@ namespace ChaD.shared.Services
         {
             while (_userSocket.Connected)
             {
-                byte[] buffer = new byte[1024];
-                string message = "";
+                var buffer = new byte[2048];
                 try
                 {
                     var bytesReceived = _userSocket.Receive(buffer);
-                    message = Encoding.UTF8.GetString(buffer)?.Replace("\0", string.Empty);
+                    var message = Encoding.UTF8.GetString(buffer)?.Replace("\0", string.Empty);
+                    MessageProcessor(message);
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    Console.WriteLine(e.Message);
                 }
 
-                MessageProcessor(message);
             }
         }
 
+
+
         public virtual void MessageProcessor(string message)
         {
-            Console.WriteLine($"{DateTime.Now.ToLongTimeString()}: {message}");
+            throw new NotImplementedException();
         }
         /// <summary>
         /// Метод для отправки сообщения по соединению

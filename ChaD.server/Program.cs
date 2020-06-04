@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Resources;
 using System.Text;
 using ChaD.server.Services;
@@ -10,9 +12,30 @@ namespace ChaD.server
     {
         static void Main(string[] args)
         {
-            Server server = new Server("127.0.0.1", 20000);
+            ArgsParser(args);
+            if (Address == null || Port == 0) return;
+            Server server = new Server(Address, Port);
             server.Run();
 
+        }
+
+        private static int Port { get; set; }
+        private static string Address { get; set; }
+        private static void ArgsParser(string[] args)
+        {
+            foreach (var arg in args)
+            {
+                if (arg.StartsWith("-address="))
+                {
+                    Address = arg.Split("=")?[1];
+                }
+
+                if (arg.StartsWith("-port="))
+                {
+                    int.TryParse(arg.Split("=")?[1], out var port);
+                    Port = port;
+                }
+            }
         }
     }
 }

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using ChaD.server.Models;
+using Serilog;
+using Serilog.Core;
 
 namespace ChaD.server.Services
 {
@@ -12,6 +13,11 @@ namespace ChaD.server.Services
     {
         public Server(string host, int port)
         {
+            Log = new LoggerConfiguration()
+                .WriteTo.Console()
+                .WriteTo.File("log-.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
             Users = new List<UserConnection>();
             _host = host;
             _port = port;
@@ -19,56 +25,47 @@ namespace ChaD.server.Services
             serverSocket.Bind(new IPEndPoint(IPAddress.Parse(host), port));
             serverSocket.Listen();
             IsWorking = true;
-            Console.WriteLine($@"Server init at {host}:{port}.");
-            }
-
+            Log.Information($"Server started at {host}:{port}.");
+        }
         private int _port;
         private string _host;
         private Socket serverSocket;
+        public static Logger Log;
 
         public bool IsWorking;
         public static List<UserConnection> Users { get; set; }
 
         public void Run()
         {
-            int counter = 0;
             while (IsWorking)
             {
                 Socket socketHandler = serverSocket.Accept();
-                Console.WriteLine($@"Got connection from {socketHandler.RemoteEndPoint}");
-                UserConnection userConnection = new UserConnection(socketHandler);
-                userConnection.UserName = $@"User-{counter++}";
-                userConnection.Id = counter;
-                Users.Add(userConnection);
-                Broadcast(Encoding.UTF8.GetBytes($@"{userConnection.UserName} connected"));
+                Log.Information($@"Accepted connection from {socketHandler.RemoteEndPoint}");
+                AddUser(socketHandler);
             }
         }
 
         public void AddUser(Socket socket)
         {
-            Users.Add(new UserConnection(socket));
+            int id = new Random().Next(0,999);
+            var user = UserFactory.Next(socket);
+            Log.Debug($"User {user.Id}:{user.UserName} connected");
+            Users.Add(user);
         }
 
-        public void DeleteUser(UserConnection userConnection)
+        public static void DeleteUser(UserConnection userConnection)
         {
-
+            Users.Remove(userConnection);
+            Broadcast($"/ud࣐{userConnection.Id}:{userConnection.UserName}");
         }
 
-        public static void SendTo(int userId, string message)
+        public static void SendTo(int authorId, int userId, string message)
         {
-            Users.FindAll(x => x.Id == userId).FirstOrDefault()?.Send(message);
-        }
-        public static void Broadcast(byte[] message)
-        {
-            Users.AsParallel().ForAll(x => x.Send(message));
+            Users.FindAll(x => x.Id == userId).FirstOrDefault()?.Send($"/pm࣐{authorId}࣐{message}");
         }
         public static void Broadcast(string message)
         {
-            foreach (var user in Users)
-            {
-                user.Send(message);
-            }
-            // Users.AsParallel().ForAll(x => x.Send(message));
+            Users.AsParallel().ForAll(x => x.Send(message));
         }
     }
 }
